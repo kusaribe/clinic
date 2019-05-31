@@ -1,14 +1,11 @@
 package com.kusaribe.spring.clinic.services.map;
 
+import com.kusaribe.spring.clinic.model.BaseEntity;
+import java.util.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+public abstract class AbstractMapService<T extends BaseEntity, ID extends Long> {
 
-public abstract class AbstractMapService<T, ID> {
-
-    protected Map<ID, T> map = new HashMap<>();
+    protected Map<Long, T> map = new HashMap<>();
 
     Set<T> findAll(){
         return new HashSet<>(map.values());
@@ -18,8 +15,15 @@ public abstract class AbstractMapService<T, ID> {
         return map.get(id);
     }
 
-    T save(ID id, T t){
-        map.put(id, t);
+    T save( T t){
+        if(t != null){
+            if(t.getId() == null){
+                t.setId(getNextId());
+            }
+            map.put(t.getId(),t);
+        }else{
+            throw new RuntimeException("object can't be null");
+        }
         return t;
     }
 
@@ -29,5 +33,18 @@ public abstract class AbstractMapService<T, ID> {
 
     void delete(T t){
         map.entrySet().removeIf( entry -> entry.getValue().equals(t));
+    }
+
+    private Long getNextId(){
+
+        Long nextId = null ;
+        try {
+            nextId = Collections.max(map.keySet()) + 1;
+        }
+        catch (NoSuchElementException e)
+        {
+            nextId = 1L;
+        }
+        return nextId ;
     }
 }
