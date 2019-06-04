@@ -1,33 +1,41 @@
 package com.kusaribe.spring.clinic.model;
 
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "pet")
 public class Pet extends BaseEntity {
+
+    @ManyToOne
+    @JoinColumn(name = "type_id")
     private PetType petType;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
     private Owner owner;
-    private LocalDate birthday;
 
-    public PetType getPetType() {
-        return petType;
-    }
+    @Column(name = "birth_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthdate;
 
-    public void setPetType(PetType petType) {
-        this.petType = petType;
-    }
 
-    public Owner getOwner() {
-        return owner;
-    }
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "pet")
+    private Set<Visit> visits = new HashSet<>();
 
-    public void setOwner(Owner owner) {
-        this.owner = owner;
-    }
 
-    public LocalDate getBirthday() {
-        return birthday;
-    }
+    @Column(name = "name")
+    private  String name;
 
-    public void setBirthday(LocalDate birthday) {
-        this.birthday = birthday;
-    }
 }
